@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin - Rakesh Bind</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js');</script>
+<link rel="stylesheet" href="assets/css/site.css">
+<link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body class="adm">
+
+<nav class="nav" aria-label="Admin">
+  <div class="wrap">
+    <a class="brand" href="index.html"><i>RB</i><span>Rakesh Bind<small>Site admin</small></span></a>
+    <div class="links" id="admNav" hidden>
+      <a href="#/" data-m="hub">Home</a>
+      <a href="#/recommendations" data-m="recommendations">Recommendations</a>
+      <a href="#/resume" data-m="resume">Resume</a>
+    </div>
+    <div class="pills">
+      <a class="pill" href="index.html">View site</a>
+      <button class="pill" type="button" id="admSignOut" hidden>Sign out</button>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ==================== LOGIN ==================== -->
+  <section class="view sec" id="m-login">
+    <div class="wrap">
+      <div class="head">
+        <span class="label">Admin</span>
+        <h2>Sign in</h2>
+        <p class="lead">Enter the admin password to manage the site. The session lasts 12 hours.</p>
+      </div>
+      <form class="card adm-login" id="admLogin" autocomplete="on">
+        <div class="f"><label for="admPass">Password</label><input id="admPass" name="password" type="password" autocomplete="current-password" required></div>
+        <div class="row" style="margin-top:6px"><button class="btn-a" type="submit" id="admSignIn">Sign in</button></div>
+        <p class="msg" id="admLoginMsg" role="status"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ==================== HUB ==================== -->
+  <section class="view sec" id="m-hub">
+    <div class="wrap">
+      <div class="head">
+        <span class="label">Admin</span>
+        <h2>What would you like to manage?</h2>
+        <p class="lead">Each module edits one part of the portfolio. Changes go live as soon as you publish.</p>
+      </div>
+      <div class="cols3 tiles">
+        <a class="card tile" href="#/recommendations">
+          <div class="ico">01</div>
+          <h3>Recommendations</h3>
+          <p>Add, edit, reorder or hide the LinkedIn recommendation cards shown on <em>What People Say</em>.</p>
+          <span class="go" id="tileRecs">Open</span>
+        </a>
+        <a class="card tile" href="#/resume">
+          <div class="ico">02</div>
+          <h3>Resume</h3>
+          <p>Replace the PDF behind the <em>Get my resume</em> button in the site header.</p>
+          <span class="go" id="tileResume">Open</span>
+        </a>
+        <div class="card tile soon">
+          <div class="ico">03</div>
+          <h3>More to come</h3>
+          <p>New modules plug in here: one tile on this page, one section below, one API route.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== MODULE: RECOMMENDATIONS ==================== -->
+  <section class="view sec" id="m-recommendations">
+    <div class="wrap">
+      <a class="back" href="#/"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 8H4M7.5 4l-4 4 4 4"/></svg> Admin home</a>
+      <div class="head">
+        <span class="label">Recommendations</span>
+        <h2>What People Say</h2>
+        <p class="lead">Edit the cards below, then click <b>Publish</b>. The first six visible cards show before "Read all"; the rest expand on click.</p>
+      </div>
+
+      <div class="card adm-top">
+        <div>
+          <div class="status" id="admStatus"></div>
+          <div class="msg" id="admMsg" role="status"></div>
+        </div>
+        <div class="r">
+          <button class="mini" type="button" id="admReload">Reload</button>
+          <button class="mini" type="button" id="admImport" title="Load the cards from recommendations.json into the editor">Import from file</button>
+          <button class="mini" type="button" id="admDownload">Download JSON</button>
+          <button class="btn-a" type="button" id="admPublish" disabled>Publish</button>
+        </div>
+      </div>
+
+      <div class="adm-grid">
+        <aside class="card adm-list">
+          <div class="lh"><h3>Cards</h3><button class="mini" type="button" id="admNew">+ New</button></div>
+          <p class="hint">The first <b id="admFeatN">6</b> visible cards are featured. Use the arrows to reorder.</p>
+          <ul id="admList"></ul>
+        </aside>
+
+        <div class="card adm-form" id="admForm" hidden>
+          <div class="lh"><h3 id="admFormTitle">Edit card</h3><span class="status" id="admFormId"></span></div>
+          <div class="row2">
+            <div class="f"><label for="fName">Name</label><input id="fName" type="text"></div>
+            <div class="f"><label for="fInitials">Initials <small>(auto if blank)</small></label><input id="fInitials" type="text" maxlength="3"></div>
+          </div>
+          <div class="f"><label for="fTitle">Designation / headline</label><input id="fTitle" type="text"></div>
+          <div class="row3">
+            <div class="f"><label for="fRel">Relationship</label>
+              <select id="fRel">
+                <option value="d">Direct report</option>
+                <option value="p">Team peer</option>
+                <option value="x">Cross-team</option>
+                <option value="s">Senior colleague</option>
+              </select>
+            </div>
+            <div class="f"><label for="fRelLabel">Label shown <small>(optional)</small></label><input id="fRelLabel" type="text" placeholder="e.g. Direct report · 1.5 yrs"></div>
+            <div class="f"><label for="fDate">Date</label><input id="fDate" type="text" placeholder="Sep 2026"></div>
+          </div>
+          <div class="row2">
+            <div class="f"><label for="fProfile">LinkedIn profile URL <small>(optional)</small></label><input id="fProfile" type="url" placeholder="https://www.linkedin.com/in/…"></div>
+            <div class="f"><label for="fColor">Avatar colour</label><div class="colr"><input id="fColor" type="color" value="#8FA0FF"><span id="fColorHex">#8FA0FF</span></div></div>
+          </div>
+          <div class="f"><label for="fText">Recommendation text <small>(blank line between paragraphs; copy it exactly from LinkedIn)</small></label><textarea id="fText" rows="10"></textarea></div>
+          <label class="chk"><input id="fHidden" type="checkbox"> Hide this card from the site (keeps it in the database)</label>
+          <div class="row" style="margin-top:18px">
+            <button class="btn-a" type="button" id="admSave">Save card</button>
+            <button class="btn-b" type="button" id="admCancel">Cancel</button>
+            <button class="mini danger" type="button" id="admDelete">Delete</button>
+          </div>
+          <div class="prev">
+            <span class="label" style="margin:26px 0 14px">Preview</span>
+            <div class="rec-grid one" id="admPreview"></div>
+          </div>
+        </div>
+
+        <div class="card adm-empty" id="admEmpty">
+          <p>Select a card on the left to edit it, or add a new one.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== MODULE: RESUME ==================== -->
+  <section class="view sec" id="m-resume">
+    <div class="wrap">
+      <a class="back" href="#/"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 8H4M7.5 4l-4 4 4 4"/></svg> Admin home</a>
+      <div class="head">
+        <span class="label">Resume</span>
+        <h2>Get my resume</h2>
+        <p class="lead">The header button downloads this PDF. Uploading a new one replaces it everywhere straight away. PDF only, up to 3 MB.</p>
+      </div>
+
+      <div class="card adm-resume">
+        <div class="lh"><h3>Current file</h3><span class="status" id="admResumeMeta">Loading…</span></div>
+        <div class="row">
+          <label class="mini" for="admResumeFile">Choose PDF…</label>
+          <input id="admResumeFile" type="file" accept="application/pdf,.pdf" hidden>
+          <span class="fname" id="admResumeName">No file chosen</span>
+          <button class="btn-a" type="button" id="admResumeUpload" disabled>Upload &amp; replace</button>
+          <a class="mini" href="/api/resume" id="admResumeDl" download>Download current</a>
+        </div>
+        <p class="msg" id="admResumeMsg" role="status"></p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="assets/js/recs.js"></script>
+<script src="assets/js/admin.js"></script>
+</body>
+</html>

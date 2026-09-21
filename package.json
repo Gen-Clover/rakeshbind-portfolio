@@ -1,0 +1,18 @@
+{
+  "name": "rakesh-bind-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Portfolio site: static front-end plus Vercel serverless API for the recommendations admin.",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "dev:local": "node dev-server.mjs",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.1"
+  }
+}
