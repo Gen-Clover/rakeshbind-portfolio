@@ -10,8 +10,9 @@ hosting + functions, Neon Postgres (via Vercel Storage) for data.
 public/                     static front-end — the only folder Vercel serves as files
   index.html                the portfolio (hash routes: #/, #/work, #/about, #/what-people-say, #/what-people-say/<id>, #/contact)
   admin.html                the admin app, served at /admin (login → hub → modules)
-  assets/css/site.css       theme + components, shared by both pages
+  assets/css/site.css       theme tokens (dark + light palettes) + components, shared by both pages
   assets/css/admin.css      admin-only styles
+  assets/js/theme.js        shared: applies the saved/OS light-dark theme before first paint, wires the toggle
   assets/js/recs.js         shared: recommendation card model/markup + API helper (window.RB)
   assets/js/site.js         public site: routing, animations, loads cards from the API
   assets/js/admin.js        admin: auth, hub routing, Recommendations and Resume modules

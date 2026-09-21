@@ -3,13 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#04050C">
 <title>Rakesh Bind - AI Product Manager &amp; Solution Architect</title>
 <meta name="description" content="Rakesh Bind builds enterprise AI, data and analytics products end to end: discovery, product definition, AI solution architecture, delivery and measurement. Case studies in agentic AI observability, data platform modernization and drug competitor intelligence.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script>document.documentElement.classList.add('js');</script>
+<script src="assets/js/theme.js"></script>
 <link rel="stylesheet" href="assets/css/site.css">
 </head>
 <body>
@@ -28,7 +30,10 @@
       <a class="pill" href="/api/resume" data-resume download>Get my resume <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2v9M4.5 7.5 8 11l3.5-3.5M3 14h10"/></svg></a>
       <a class="pill" href="#/contact">Get in touch</a>
     </div>
-    <button class="menu" id="menuBtn" type="button" aria-expanded="false" aria-controls="drawer">Menu</button>
+    <div class="tools">
+      <button class="theme" type="button" data-theme-toggle aria-label="Switch theme"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button>
+      <button class="menu" id="menuBtn" type="button" aria-expanded="false" aria-controls="drawer">Menu</button>
+    </div>
   </div>
   <div class="drawer" id="drawer">
     <a href="#/" data-r="home">Home</a>
@@ -83,12 +88,12 @@
       <svg viewBox="0 0 1200 160">
         <defs>
           <linearGradient id="eg" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1200" y2="0">
-            <stop offset="0" stop-color="#FF7B84"/>
-            <stop offset="0.24" stop-color="#FF7B84"/>
-            <stop offset="0.28" stop-color="#B98CFF"/>
-            <stop offset="0.35" stop-color="#B98CFF"/>
-            <stop offset="0.40" stop-color="#7C8CFF"/>
-            <stop offset="1" stop-color="#5C6CE0"/>
+            <stop offset="0" style="stop-color:var(--err)"/>
+            <stop offset="0.24" style="stop-color:var(--err)"/>
+            <stop offset="0.28" style="stop-color:var(--a2)"/>
+            <stop offset="0.35" style="stop-color:var(--a2)"/>
+            <stop offset="0.40" style="stop-color:var(--a1)"/>
+            <stop offset="1" style="stop-color:var(--a1-deep)"/>
           </linearGradient>
         </defs>
         <path class="trace" pathLength="1" d="M0 90 h20
@@ -676,14 +681,14 @@
       <svg viewBox="0 0 1200 160">
         <defs>
           <linearGradient id="eg2" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1200" y2="0">
-            <stop offset="0" stop-color="#5C6CE0"/>
-            <stop offset="0.285" stop-color="#7C8CFF"/>
-            <stop offset="0.295" stop-color="#FF7B84"/>
-            <stop offset="0.365" stop-color="#FF7B84"/>
-            <stop offset="0.375" stop-color="#B98CFF"/>
-            <stop offset="0.6" stop-color="#B98CFF"/>
-            <stop offset="0.615" stop-color="#7C8CFF"/>
-            <stop offset="1" stop-color="#5C6CE0"/>
+            <stop offset="0" style="stop-color:var(--a1-deep)"/>
+            <stop offset="0.285" style="stop-color:var(--a1)"/>
+            <stop offset="0.295" style="stop-color:var(--err)"/>
+            <stop offset="0.365" style="stop-color:var(--err)"/>
+            <stop offset="0.375" style="stop-color:var(--a2)"/>
+            <stop offset="0.6" style="stop-color:var(--a2)"/>
+            <stop offset="0.615" style="stop-color:var(--a1)"/>
+            <stop offset="1" style="stop-color:var(--a1-deep)"/>
           </linearGradient>
         </defs>
         <path class="trace" style="stroke:url(#eg2)" pathLength="1" d="M0 90 h30
@@ -1138,12 +1143,12 @@
       <svg viewBox="0 0 1200 160">
         <defs>
           <linearGradient id="eg3" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1200" y2="0">
-            <stop offset="0" stop-color="#FF7B84"/>
-            <stop offset="0.30" stop-color="#FF7B84"/>
-            <stop offset="0.36" stop-color="#B98CFF"/>
-            <stop offset="0.48" stop-color="#B98CFF"/>
-            <stop offset="0.56" stop-color="#7C8CFF"/>
-            <stop offset="1" stop-color="#5C6CE0"/>
+            <stop offset="0" style="stop-color:var(--err)"/>
+            <stop offset="0.30" style="stop-color:var(--err)"/>
+            <stop offset="0.36" style="stop-color:var(--a2)"/>
+            <stop offset="0.48" style="stop-color:var(--a2)"/>
+            <stop offset="0.56" style="stop-color:var(--a1)"/>
+            <stop offset="1" style="stop-color:var(--a1-deep)"/>
           </linearGradient>
         </defs>
         <path class="trace" style="stroke:url(#eg3)" pathLength="1" d="M0 90 h16
@@ -1515,12 +1520,12 @@
       <svg viewBox="0 0 1200 160">
         <defs>
           <linearGradient id="eg4" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1200" y2="0">
-            <stop offset="0" stop-color="#FF7B84"/>
-            <stop offset="0.20" stop-color="#FF7B84"/>
-            <stop offset="0.27" stop-color="#B98CFF"/>
-            <stop offset="0.52" stop-color="#B98CFF"/>
-            <stop offset="0.60" stop-color="#7C8CFF"/>
-            <stop offset="1" stop-color="#5C6CE0"/>
+            <stop offset="0" style="stop-color:var(--err)"/>
+            <stop offset="0.20" style="stop-color:var(--err)"/>
+            <stop offset="0.27" style="stop-color:var(--a2)"/>
+            <stop offset="0.52" style="stop-color:var(--a2)"/>
+            <stop offset="0.60" style="stop-color:var(--a1)"/>
+            <stop offset="1" style="stop-color:var(--a1-deep)"/>
           </linearGradient>
         </defs>
         <path class="trace" style="stroke:url(#eg4)" pathLength="1" d="M0 90 h14

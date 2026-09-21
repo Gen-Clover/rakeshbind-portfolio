@@ -3,13 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#04050C">
 <meta name="robots" content="noindex, nofollow">
 <title>Admin - Rakesh Bind</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script>document.documentElement.classList.add('js');</script>
+<script src="assets/js/theme.js"></script>
 <link rel="stylesheet" href="assets/css/site.css">
 <link rel="stylesheet" href="assets/css/admin.css">
 </head>
@@ -23,9 +25,12 @@
       <a href="#/recommendations" data-m="recommendations">Recommendations</a>
       <a href="#/resume" data-m="resume">Resume</a>
     </div>
-    <div class="pills">
-      <a class="pill" href="index.html">View site</a>
-      <button class="pill" type="button" id="admSignOut" hidden>Sign out</button>
+    <div class="tools">
+      <div class="pills">
+        <a class="pill" href="index.html">View site</a>
+        <button class="pill" type="button" id="admSignOut" hidden>Sign out</button>
+      </div>
+      <button class="theme" type="button" data-theme-toggle aria-label="Switch theme"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button>
     </div>
   </div>
 </nav>

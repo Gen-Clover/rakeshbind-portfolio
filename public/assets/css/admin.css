@@ -2,10 +2,10 @@
   /* ---------- Admin components ---------- */
   .adm code { font-family: var(--mono); font-size: .85em; color: var(--ink); }
   .adm input:not([type=checkbox]):not([type=color]), .adm textarea, .adm select { font: inherit; font-size: .95rem; line-height: 1.45; color: var(--ink); background: var(--surface-2); border: 1px solid var(--line-2); border-radius: 12px; padding: 11px 14px; width: 100%; transition: border-color .25s; }
-  .adm input:focus, .adm textarea:focus, .adm select:focus { outline: none; border-color: rgba(124,140,255,.6); }
+  .adm input:focus, .adm textarea:focus, .adm select:focus { outline: none; border-color: rgba(var(--a1-rgb),.6); }
   .adm textarea { resize: vertical; min-height: 160px; }
   .adm select { appearance: none; -webkit-appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%); background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 36px; }
-  .adm select option { background: #0E1120; }
+  .adm select option { background: var(--bg-2); }
   .adm .f { margin-bottom: 16px; }
   .adm .f label { display: block; font-family: var(--mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); margin-bottom: 7px; }
   .adm .f label small { text-transform: none; letter-spacing: 0; font-family: var(--font); font-size: .78rem; }
@@ -18,8 +18,8 @@
   .adm .colr input { width: 46px; height: 42px; padding: 3px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--surface-2); cursor: pointer; }
   .adm .colr span { font-family: var(--mono); font-size: .85rem; color: var(--muted); }
   .adm .mini { font: inherit; font-size: .82rem; font-weight: 500; color: var(--muted); background: var(--surface-2); border: 1px solid var(--line-2); border-radius: 999px; padding: 7px 14px; cursor: pointer; transition: background .25s, border-color .25s, color .25s; }
-  .adm .mini:hover { background: var(--a1-soft); border-color: rgba(124,140,255,.5); color: var(--ink); }
-  .adm .mini.danger:hover { background: rgba(255,123,132,.12); border-color: rgba(255,123,132,.5); color: var(--err); }
+  .adm .mini:hover { background: var(--a1-soft); border-color: rgba(var(--a1-rgb),.5); color: var(--ink); }
+  .adm .mini.danger:hover { background: rgba(var(--err-rgb),.12); border-color: rgba(var(--err-rgb),.5); color: var(--err); }
   .adm .btn-a { font: inherit; cursor: pointer; }
   .adm .btn-b { font: inherit; cursor: pointer; }
   .adm .btn-a[disabled] { opacity: .4; pointer-events: none; }
@@ -42,18 +42,18 @@
   .adm-list ul { list-style: none; margin: 0; padding: 0; }
   .adm-list li { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 12px; border: 1px solid transparent; cursor: pointer; transition: background .2s, border-color .2s; }
   .adm-list li:hover { background: var(--surface); }
-  .adm-list li.sel { background: var(--a1-soft); border-color: rgba(124,140,255,.35); }
+  .adm-list li.sel { background: var(--a1-soft); border-color: rgba(var(--a1-rgb),.35); }
   .adm-list li.hid .nm, .adm-list li.hid .av { opacity: .45; }
-  .adm-list li .av { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: .66rem; font-weight: 700; color: #0A0C18; background: var(--av, var(--a1)); }
+  .adm-list li .av { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: .66rem; font-weight: 700; color: var(--on-av); background: var(--av, var(--a1)); }
   .adm-list li .nm { flex: 1; min-width: 0; font-size: .92rem; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .adm-list li .nm small { display: block; font-family: var(--mono); font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); font-weight: 400; }
   .adm-list li .n { font-family: var(--mono); font-size: .72rem; color: var(--dim); width: 18px; text-align: right; }
   .adm-list li .mv { display: flex; flex-direction: column; gap: 2px; }
   .adm-list li .mv button { font: inherit; width: 22px; height: 16px; line-height: 1; font-size: .6rem; color: var(--muted); background: var(--surface-2); border: 1px solid var(--line-2); border-radius: 5px; cursor: pointer; padding: 0; }
-  .adm-list li .mv button:hover { color: var(--ink); border-color: rgba(124,140,255,.5); }
+  .adm-list li .mv button:hover { color: var(--ink); border-color: rgba(var(--a1-rgb),.5); }
   .adm-list li .mv button[disabled] { opacity: .25; pointer-events: none; }
   .adm-list li .tag { font-family: var(--mono); font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); border: 1px solid var(--line-2); border-radius: 999px; padding: 2px 7px; }
-  .adm-list li.is-feat .tag { color: var(--a1); border-color: rgba(124,140,255,.4); }
+  .adm-list li.is-feat .tag { color: var(--a1); border-color: rgba(var(--a1-rgb),.4); }
   .adm-form h3 { margin-top: 0; }
   .adm-empty { display: grid; place-items: center; min-height: 240px; color: var(--dim); text-align: center; }
   .adm-empty p { margin: 0; }
