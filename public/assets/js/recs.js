@@ -15,6 +15,27 @@
   function listNames(names) { return names.length < 2 ? names.join('') : names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1]; }
   function fmtBytes(b) { return b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
 
+  /* One sentence to stand in for the whole recommendation (home-page strip). Prefers a mid-length
+     sentence that says something specific over the "I had the opportunity to work with..." opener. */
+  var HOT = /leader|mentor|technic|architect|ownership|trust|calm|problem|guid|clear|deliver|question|think|growth|expert|\bai\b|data/gi;
+  var OPENER = /^(i had|having|working with|it was|i (truly|highly|would))/i;
+  function pullQuote(text, max) {
+    max = max || 210;
+    var sents = String(text || '').replace(/\s+/g, ' ').match(/[^.!?]+[.!?]+["”']?|[^.!?]+$/g) || [];
+    var best = null, bestScore = -Infinity;
+    sents.forEach(function (s) {
+      s = s.trim();
+      if (s.length < 50 || s.length > max) return;
+      var score = (s.match(HOT) || []).length - (OPENER.test(s) ? 3 : 0);
+      if (score > bestScore) { bestScore = score; best = s; }
+    });
+    if (!best) {
+      best = (sents[0] || String(text || '')).trim();
+      if (best.length > max) best = best.slice(0, max).replace(/\s+\S*$/, '') + '…';
+    }
+    return best;
+  }
+
   function normRec(r) {
     return {
       id: r.id || String(r.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || ('rec-' + Date.now()),
@@ -30,7 +51,7 @@
   /* One card. `more` marks cards hidden behind "Read all". */
   function recCard(r, i, more) {
     var rel = REL[r.relType] ? r.relType : 'd';
-    return '<article class="card rec reveal' + (more ? ' more' : '') + '" style="--av:' + esc(r.color || '#8FA0FF') + ';--d:' + ((i % 3) * 90) + 'ms">' +
+    return '<article class="card rec reveal' + (more ? ' more' : '') + '" data-id="' + esc(r.id) + '" style="--av:' + esc(r.color || '#8FA0FF') + ';--d:' + ((i % 3) * 90) + 'ms">' +
       '<div class="who"><span class="av">' + esc(r.initials || initialsOf(r.name)) + '</span><div><span class="nm">' + esc(r.name) + '</span><span class="ttl" title="' + esc(r.title) + '">' + esc(r.title) + '</span></div></div>' +
       '<div class="rel ' + rel + '">' + esc(r.relationship || REL[rel]) + (r.date ? ' <small>· ' + esc(r.date) + '</small>' : '') + '</div>' +
       '<blockquote><div class="q">' + paras(r.text).map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') + '</div></blockquote>' +
@@ -50,5 +71,5 @@
     });
   }
 
-  window.RB = { REL: REL, API: API, LI_RECS: LI_RECS, EXT: EXT, esc: esc, initialsOf: initialsOf, paras: paras, listNames: listNames, fmtBytes: fmtBytes, normRec: normRec, normDoc: normDoc, recCard: recCard, getJson: getJson };
+  window.RB = { REL: REL, API: API, LI_RECS: LI_RECS, EXT: EXT, esc: esc, initialsOf: initialsOf, paras: paras, listNames: listNames, fmtBytes: fmtBytes, pullQuote: pullQuote, normRec: normRec, normDoc: normDoc, recCard: recCard, getJson: getJson };
 })();

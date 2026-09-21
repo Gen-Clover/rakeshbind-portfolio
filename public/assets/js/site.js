@@ -158,9 +158,13 @@
 
   function go(hash) {
     if (/^#\/admin(\/|$)/.test(hash)) { location.replace('admin.html'); return; }   // admin moved to its own page
+    var deep = /^#\/what-people-say\/([a-z0-9-]+)$/i.exec(hash);   // #/what-people-say/<rec id> opens one card
+    pendingRec = deep ? deep[1].toLowerCase() : null;
+    if (deep) hash = '#/what-people-say';
     var key = ROUTES[hash];
     if (!key) key = 'home';
-    if (key === current) return;
+    if (key !== 'say') focusedRec = null;
+    if (key === current) { if (key === 'say') focusRec(); return; }
     current = key;
 
     $$('.view').forEach(function (v) { v.classList.toggle('on', v.id === 'v-' + key); });
@@ -189,7 +193,7 @@
     initReveals(activeView);
     initLoops(activeView);
     initScroll(activeView);
-    if (key === 'say') fitRecs();
+    if (key === 'say') { fitRecs(); focusRec(); }
 
     var hero = $('.hero', activeView);
     if (hero) {
@@ -244,7 +248,120 @@
         '<button class="btn-a" type="button" id="recAll">Read all ' + items.length + '</button>' +
         '<a class="btn-b" href="' + LI_RECS + '" target="_blank" rel="noopener">View on LinkedIn ' + EXT + '</a>' +
       '</div>';
-    if (activeView && activeView.id === 'v-say') { revealNew(grid); revealNew(bar.parentNode); fitRecs(); }
+    if (activeView && activeView.id === 'v-say') { revealNew(grid); revealNew(bar.parentNode); fitRecs(); focusRec(); }
+    renderTicker(items);
+  }
+
+  /* Home page strip: one pull-quote per recommendation, scrolling continuously. The set is
+     rendered twice so the loop is seamless; the copy is inert so it is not read or tabbed twice. */
+  function renderTicker(items) {
+    var rail = $('#tickerRail'), sec = $('#homeSay');
+    if (!rail) return;
+    sec.hidden = items.length === 0;
+    if (!items.length) return;
+    var set = items.map(function (r) {
+      return '<a class="card tq" href="#/what-people-say/' + esc(r.id) + '" draggable="false" style="--av:' + esc(r.color) + '" aria-label="Read the full recommendation from ' + esc(r.name) + '">' +
+        '<p class="q">“' + esc(RB.pullQuote(r.text)) + '”</p>' +
+        '<div class="who"><span class="av">' + esc(r.initials || initialsOf(r.name)) + '</span><div><span class="nm">' + esc(r.name) + '</span><span class="ttl">' + esc(r.title) + '</span></div></div>' +
+        '</a>';
+    }).join('');
+    rail.innerHTML = '<div class="set">' + set + '</div><div class="set" aria-hidden="true" inert>' + set + '</div>';
+    strip.refresh();
+  }
+
+  /* Strip motion. One offset drives everything: it creeps forward on its own, follows the pointer
+     while pressed, keeps a little momentum after a fling, and resumes creeping a moment later.
+     A press that travels more than a few pixels is a drag, so the card underneath does not open.
+     Under reduced motion the strip is a plain horizontal scroller (CSS) and none of this runs. */
+  var strip = (function () {
+    var el = $('#ticker'), rail = $('#tickerRail');
+    if (!el || !rail || reduce) return { refresh: function () {} };
+    var SPEED = 44, GAP = 18, SLOP = 6, REST = 2000;
+    var x = 0, loop = 0, last = 0, raf = null, visible = false, hover = false, focus = false;
+    var drag = null, vel = 0, idleUntil = 0, suppress = false;
+
+    function measure() { var s = $('.set', rail); loop = s ? s.getBoundingClientRect().width + GAP : 0; }
+    function paint() { rail.style.transform = 'translate3d(' + (-x).toFixed(2) + 'px,0,0)'; }
+    function tick(t) {
+      raf = null;
+      var dt = Math.min(0.05, (t - last) / 1000 || 0); last = t;
+      if (!drag) {
+        if (Math.abs(vel) > 4) { x += vel * dt; vel *= Math.pow(0.03, dt); }      // fling decays to ~3% per second
+        else if (!hover && !focus && t > idleUntil) x += SPEED * dt;
+      }
+      if (loop) x = ((x % loop) + loop) % loop;
+      paint();
+      if (visible) raf = requestAnimationFrame(tick);
+    }
+    function run() { if (!raf && visible) { last = performance.now(); raf = requestAnimationFrame(tick); } }
+
+    el.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0) return;
+      drag = { x0: e.clientX, x: e.clientX, t: performance.now(), pos: x, moved: false };
+      vel = 0;
+    });
+    el.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      var now = performance.now(), dt = (now - drag.t) / 1000 || 0.016;
+      if (!drag.moved && Math.abs(e.clientX - drag.x0) > SLOP) {
+        drag.moved = true;
+        el.setPointerCapture(e.pointerId);   // capture only once it is a drag: capturing on press would steal the click from the link
+        el.classList.add('dragging');
+      }
+      if (drag.moved) x = drag.pos - (e.clientX - drag.x0);
+      vel = 0.75 * (-(e.clientX - drag.x) / dt) + 0.25 * vel;
+      drag.x = e.clientX; drag.t = now;
+      paint();
+    });
+    function release(e) {
+      if (!drag) return;
+      var moved = drag.moved, still = performance.now() - drag.t > 80;
+      drag = null;
+      el.classList.remove('dragging');
+      try { el.releasePointerCapture(e.pointerId); } catch (err) {}
+      if (!moved || still) vel = 0;   // a plain click, or a release after holding still, has no fling
+      idleUntil = performance.now() + REST;
+      if (moved) { suppress = true; setTimeout(function () { suppress = false; }, 60); }
+      run();
+    }
+    el.addEventListener('pointerup', release);
+    el.addEventListener('pointercancel', release);
+    el.addEventListener('click', function (e) { if (suppress) { e.preventDefault(); e.stopPropagation(); } }, true);
+    el.addEventListener('dragstart', function (e) { e.preventDefault(); });
+
+    el.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') hover = true; });
+    el.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') hover = false; });
+    el.addEventListener('focusin', function (e) {   // keyboard focus pauses the strip; a mouse press also focuses the link, and must not
+      try { focus = e.target.matches(':focus-visible'); } catch (err) { focus = false; }
+    });
+    el.addEventListener('focusout', function () { focus = false; });
+    window.addEventListener('resize', measure);
+    new IntersectionObserver(function (entries) {
+      visible = entries[0].isIntersecting;
+      if (visible) { measure(); run(); }
+    }, { threshold: 0 }).observe(el);
+
+    return { refresh: function () { measure(); paint(); run(); } };
+  })();
+
+  /* Deep link (#/what-people-say/<id>, e.g. from the home strip): show the card even if it is behind
+     "Read all", expand the full text, scroll to it and pulse a highlight. Runs once the cards exist. */
+  var pendingRec = null, focusedRec = null;
+  function focusRec() {
+    if (!pendingRec || !activeView || activeView.id !== 'v-say') return;
+    var grid = $('#recGrid'), card = $('.rec[data-id="' + pendingRec + '"]', grid);
+    if (!card) return;
+    focusedRec = pendingRec; pendingRec = null;
+    if (card.classList.contains('more') && !grid.classList.contains('all')) { grid.classList.add('all'); $('#recBar').classList.add('done'); fitRecs(); }
+    var q = $('.q', card), btn = $('.more-btn', card);
+    q.classList.remove('clamp');
+    btn.setAttribute('aria-expanded', 'true'); btn.textContent = 'Show less';
+    card.classList.add('in');
+    setTimeout(function () {
+      card.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      card.classList.add('hl');
+      setTimeout(function () { card.classList.remove('hl'); }, 2600);
+    }, 120);
   }
 
   /* Observe cards that were added after the view's reveal observer was set up */
@@ -260,12 +377,17 @@
       try { doc = JSON.parse($('#recFallback').textContent); } catch (e) {}
       recData = normDoc(doc); renderRecs();
     };
-    if (location.protocol === 'file:' || !window.fetch) { inline(); return; }
+    inline();   // paint the committed copy at once (no empty strip on the home page), then refresh from the API
+    if (location.protocol === 'file:' || !window.fetch) return;
     var fromFile = function () { return getJson('recommendations.json?v=' + Date.now(), { cache: 'no-store' }); };
     getJson(API.recs, { credentials: 'same-origin' })
       .then(function (doc) { return (doc.items && doc.items.length) ? doc : fromFile(); }, fromFile)
-      .then(function (doc) { recData = normDoc(doc); renderRecs(); })
-      .catch(inline);
+      .then(function (doc) {
+        doc = normDoc(doc);
+        if (JSON.stringify(doc) === JSON.stringify(recData)) return;   // same as the inline copy: leave the DOM alone
+        recData = doc; pendingRec = pendingRec || focusedRec; renderRecs();
+      })
+      .catch(function () {});   // the inline copy is already on screen
   }
 
   /* Clamp long quotes so the grid stays even; the full text is always in the DOM */

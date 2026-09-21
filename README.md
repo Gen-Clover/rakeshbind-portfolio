@@ -8,7 +8,7 @@ hosting + functions, Neon Postgres (via Vercel Storage) for data.
 
 ```
 public/                     static front-end — the only folder Vercel serves as files
-  index.html                the portfolio (hash routes: #/, #/work, #/about, #/what-people-say, #/contact)
+  index.html                the portfolio (hash routes: #/, #/work, #/about, #/what-people-say, #/what-people-say/<id>, #/contact)
   admin.html                the admin app, served at /admin (login → hub → modules)
   assets/css/site.css       theme + components, shared by both pages
   assets/css/admin.css      admin-only styles
