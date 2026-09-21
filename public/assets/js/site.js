@@ -38,6 +38,39 @@
     }, { passive: true });
   }
 
+  /* ---------- Availability badge ---------- */
+  /* One place to update; rendered into every [data-avail] (home, about and contact heroes). */
+  var AVAIL = {
+    status: 'Open to work',
+    facts: [
+      ['Notice period', 'Can join immediately'],
+      ['Location', 'Global \u00b7 onsite, relocate or remote']
+    ]
+  };
+  $$('[data-avail]').forEach(function (el) {
+    el.innerHTML = '<span class="st"><i></i>' + esc(AVAIL.status) + '</span>' +
+      AVAIL.facts.map(function (f) { return '<span class="fact"><small>' + esc(f[0]) + '</small>' + esc(f[1]) + '</span>'; }).join('');
+  });
+
+  /* ---------- "Next case study" footers ---------- */
+  /* Each study ends with [data-next="#/work/..."]; the card is built from that study's entry on the
+     Work page so titles and blurbs are written once. */
+  var studies = $$('#v-work a.card.proj[href^="#/work/"]');
+  $$('[data-next]').forEach(function (el) {
+    var href = el.getAttribute('data-next'), i = -1;
+    var src = studies.filter(function (a, k) { if (a.getAttribute('href') === href) { i = k; return true; } return false; })[0];
+    if (!src) return;
+    var kicker = $('.k', src).textContent.replace(/^Case study\s*[\u00b7-]\s*/i, '');
+    el.innerHTML =
+      '<a class="card proj next reveal" href="' + esc(href) + '">' +
+        '<span class="k">Next case study \u00b7 ' + (i + 1) + ' of ' + studies.length + ' \u00b7 ' + esc(kicker) + '</span>' +
+        '<h3>' + $('h3', src).innerHTML + '</h3>' +
+        '<p>' + $('p', src).innerHTML + '</p>' +
+        '<span class="go">Read the case study <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h9M8.5 4l4 4-4 4"/></svg></span>' +
+      '</a>' +
+      '<p class="note"><a href="#/work">\u2190 All work</a></p>';
+  });
+
   /* ---------- Routing ---------- */
   var ROUTES = {
     '#/': 'home',

@@ -179,6 +179,16 @@
   .js .ln > span { transform: translateY(112%); transition: transform 1.1s var(--ease) calc(var(--l) * 130ms + 250ms); }
   .js .hero.go .ln > span { transform: none; }
   .hero .lead { margin: 0 0 32px; max-width: 46ch; }
+  /* Availability badge (rendered by site.js into [data-avail]) */
+  .avail { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0; margin: -8px 0 28px; border: 1px solid var(--line-2); border-radius: 18px; background: var(--surface); overflow: hidden; }
+  .avail > span { display: flex; flex-direction: column; justify-content: center; padding: 12px 20px; font-size: .92rem; color: var(--ink); line-height: 1.3; }
+  .avail > span + span { border-left: 1px solid var(--line); }
+  .avail small { font-family: var(--mono); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); margin-bottom: 4px; }
+  .avail .st { flex-direction: row; align-items: center; gap: 10px; font-weight: 600; color: var(--ok); background: rgba(var(--ok-rgb),.08); }
+  .avail .st i { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 0 rgba(var(--ok-rgb),.6); animation: avail-pulse 2.2s ease-out infinite; }
+  @keyframes avail-pulse { 0% { box-shadow: 0 0 0 0 rgba(var(--ok-rgb),.55); } 70% { box-shadow: 0 0 0 9px rgba(var(--ok-rgb),0); } 100% { box-shadow: 0 0 0 0 rgba(var(--ok-rgb),0); } }
+  @media (prefers-reduced-motion: reduce) { .avail .st i { animation: none; box-shadow: 0 0 10px rgba(var(--ok-rgb),.6); } }
+  @media (max-width: 760px) { .avail { display: flex; flex-direction: column; align-items: stretch; width: 100%; } .avail > span + span { border-left: 0; border-top: 1px solid var(--line); } }
   .chips { display: flex; flex-wrap: wrap; gap: 10px; }
   .chip { font-size: .88rem; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface); color: var(--muted); }
   .chip b { color: var(--ink); font-weight: 600; }
@@ -629,3 +639,10 @@
   :root[data-theme="light"] .ecg .flag { filter: drop-shadow(0 0 6px rgba(var(--a2-rgb),.5)); }
   :root[data-theme="light"] .label::before { box-shadow: 0 0 8px rgba(var(--a1-rgb),.6); }
   :root[data-theme="light"] .tl li.on::before { background: var(--num-grad); }
+
+  /* ---------- Next case study (rendered by site.js into [data-next]) ---------- */
+  .next-wrap { margin-top: 48px; max-width: 720px; }
+  .next-wrap .next { border-color: rgba(var(--a1-rgb),.35); }
+  .next-wrap .next:hover { transform: translateY(-3px); border-color: rgba(var(--a1-rgb),.6); }
+  .next-wrap .next h3 { font-size: 1.35rem; }
+  .next-wrap .note { margin-top: 18px; }
