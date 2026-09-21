@@ -12,7 +12,7 @@ public/                     static front-end — the only folder Vercel serves a
   admin.html                the admin app, served at /admin (login → hub → modules)
   assets/css/site.css       theme tokens (dark + light palettes) + components, shared by both pages
   assets/css/admin.css      admin-only styles
-  assets/js/theme.js        shared: applies the saved/OS light-dark theme before first paint, wires the toggle
+  assets/js/theme.js        shared: dark by default, applies a saved light choice before first paint, wires the toggle
   assets/js/recs.js         shared: recommendation card model/markup + API helper (window.RB)
   assets/js/site.js         public site: routing, animations, loads cards from the API
   assets/js/admin.js        admin: auth, hub routing, Recommendations and Resume modules

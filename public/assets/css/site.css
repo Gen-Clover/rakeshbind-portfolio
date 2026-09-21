@@ -1,7 +1,7 @@
 /* Site theme and components. Shared by index.html and admin.html. */
   /* ---------- Theme tokens ----------
      Every colour on the site comes from these. Dark is the default; <html data-theme="light">
-     (set by assets/js/theme.js from the saved choice or the OS preference) swaps the palette.
+     (set by assets/js/theme.js when the visitor chose light) swaps the palette.
      The *-rgb triplets exist so translucent tints can be written as rgba(var(--x-rgb), .2). */
   :root {
     --bg: #04050C;
