@@ -314,10 +314,10 @@
         var l = $('#avL' + i).value.trim(), v = $('#avV' + i).value.trim();
         if (l || v) facts.push({ label: l, value: v });
       }
-      return { show: $('#avShow').checked, status: $('#avText').value.trim(), facts: facts };
+      return { show: $('#avShow').checked, status: $('#avText').value, facts: facts };
     },
     fill: function (doc) {
-      $('#avText').value = doc.status || '';
+      $('#avText').value = RB.STATUS[doc.status] ? doc.status : 'open';
       $('#avShow').checked = doc.show !== false;
       for (var i = 0; i < 4; i++) {
         var f = (doc.facts || [])[i] || {};
@@ -330,7 +330,6 @@
       p.innerHTML = RB.availBadge(doc);
       p.style.opacity = doc.show ? '' : '.35';
       var problems = [];
-      if (!doc.status) problems.push('Status text is required.');
       doc.facts.forEach(function (f, i) { if (!f.label || !f.value) problems.push('Fact ' + (i + 1) + ' needs both a label and a value.'); });
       say('#avMsg', problems.length ? esc(problems.join(' ')) : (Avail.dirty ? 'Unpublished changes.' : ''), problems.length ? 'err' : '');
       $('#avPublish').disabled = !Avail.dirty || problems.length > 0;
@@ -359,7 +358,8 @@
         });
     },
     init: function () {
-      $$('#m-availability input').forEach(function (el) {
+      $('#avText').innerHTML = Object.keys(RB.STATUS).map(function (k) { return '<option value="' + k + '">' + esc(RB.STATUS[k].label) + '</option>'; }).join('');
+      $$('#m-availability input, #m-availability select').forEach(function (el) {
         el.addEventListener('input', function () { Avail.setDirty(true); });
         el.addEventListener('change', function () { Avail.setDirty(true); });
       });

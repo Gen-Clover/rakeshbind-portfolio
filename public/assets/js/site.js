@@ -43,7 +43,7 @@
      first; the admin's published version (API, or availability.json in local dev) replaces it. */
   var AVAIL = {
     show: true,
-    status: 'Open to work',
+    status: 'open',
     facts: [
       { label: 'Notice period', value: 'Can join immediately' },
       { label: 'Location', value: 'Global \u00b7 onsite, relocate or remote' }

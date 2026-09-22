@@ -60,9 +60,20 @@
       '</article>';
   }
 
-  /* Availability badge markup (home/about/contact heroes and the admin preview). */
+  /* Availability badge: the career states the status dropdown offers, each with a colour (tone)
+     and whether the dot pulses. Keys are what the API stores; labels are what visitors read. */
+  var STATUS = {
+    open:      { label: 'Open to work',            tone: 'ok',   live: true },
+    notice:    { label: 'Serving notice period',   tone: 'warn', live: true },
+    freelance: { label: 'Available for consulting', tone: 'a2',  live: true },
+    passive:   { label: 'Open to conversations',   tone: 'a1',   live: false },
+    joined:    { label: 'Just joined a new role',  tone: 'rose', live: false },
+    busy:      { label: 'Not looking right now',   tone: 'dim',  live: false }
+  };
+  function statusOf(key) { return STATUS[key] || STATUS.open; }
   function availBadge(doc) {
-    return '<span class="st"><i></i>' + esc(doc.status) + '</span>' +
+    var st = statusOf(doc.status);
+    return '<span class="st t-' + st.tone + (st.live ? ' live' : '') + '"><i></i>' + esc(st.label) + '</span>' +
       (doc.facts || []).map(function (f) { return '<span class="fact"><small>' + esc(f.label) + '</small>' + esc(f.value) + '</span>'; }).join('');
   }
 
@@ -77,5 +88,5 @@
     });
   }
 
-  window.RB = { REL: REL, API: API, LI_RECS: LI_RECS, EXT: EXT, esc: esc, initialsOf: initialsOf, paras: paras, listNames: listNames, fmtBytes: fmtBytes, pullQuote: pullQuote, normRec: normRec, normDoc: normDoc, recCard: recCard, availBadge: availBadge, getJson: getJson };
+  window.RB = { REL: REL, API: API, LI_RECS: LI_RECS, EXT: EXT, esc: esc, initialsOf: initialsOf, paras: paras, listNames: listNames, fmtBytes: fmtBytes, pullQuote: pullQuote, normRec: normRec, normDoc: normDoc, recCard: recCard, STATUS: STATUS, statusOf: statusOf, availBadge: availBadge, getJson: getJson };
 })();

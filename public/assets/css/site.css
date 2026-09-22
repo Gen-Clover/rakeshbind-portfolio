@@ -19,7 +19,9 @@
     --a2: #B98CFF;  --a2-rgb: 185,140,255;
     --err: #FF7B84; --err-rgb: 255,123,132;
     --ok: #4ADE9B;  --ok-rgb: 74,222,155;
-    --rose: #FF8FA3;                 /* cross-team relationship label */
+    --warn: #FFC86B; --warn-rgb: 255,200,107;
+    --rose: #FF8FA3; --rose-rgb: 255,143,163;   /* cross-team label, "just joined" status */
+    --dim-rgb: 93,101,132;
     --a1-soft: rgba(var(--a1-rgb),0.14);
     --a1-deep: #5C6CE0;              /* far end of the ECG gradient */
     --hot: #9CAAFF;                  /* active node / arrow in the diagrams */
@@ -59,7 +61,9 @@
     --a2: #8452E0;  --a2-rgb: 132,82,224;
     --err: #D93A48; --err-rgb: 217,58,72;
     --ok: #158F5A;  --ok-rgb: 21,143,90;
-    --rose: #C93B58;
+    --warn: #A8690F; --warn-rgb: 168,105,15;
+    --rose: #C93B58; --rose-rgb: 201,59,88;
+    --dim-rgb: 122,130,156;
     --a1-soft: rgba(var(--a1-rgb),0.12);
     --a1-deep: #3546C8;
     --hot: #3D4ED8;
@@ -184,10 +188,17 @@
   .avail > span { display: flex; flex-direction: column; justify-content: center; padding: 12px 20px; font-size: .92rem; color: var(--ink); line-height: 1.3; }
   .avail > span + span { border-left: 1px solid var(--line); }
   .avail small { font-family: var(--mono); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); margin-bottom: 4px; }
-  .avail .st { flex-direction: row; align-items: center; gap: 10px; font-weight: 600; color: var(--ok); background: rgba(var(--ok-rgb),.08); }
-  .avail .st i { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 0 rgba(var(--ok-rgb),.6); animation: avail-pulse 2.2s ease-out infinite; }
-  @keyframes avail-pulse { 0% { box-shadow: 0 0 0 0 rgba(var(--ok-rgb),.55); } 70% { box-shadow: 0 0 0 9px rgba(var(--ok-rgb),0); } 100% { box-shadow: 0 0 0 0 rgba(var(--ok-rgb),0); } }
-  @media (prefers-reduced-motion: reduce) { .avail .st i { animation: none; box-shadow: 0 0 10px rgba(var(--ok-rgb),.6); } }
+  /* The status chip takes its colour from a tone class (see STATUS in recs.js); .live pulses the dot */
+  .avail .st { --t: var(--ok); --t-rgb: var(--ok-rgb); flex-direction: row; align-items: center; gap: 10px; font-weight: 600; color: var(--t); background: rgba(var(--t-rgb),.08); }
+  .avail .st.t-a1 { --t: var(--a1); --t-rgb: var(--a1-rgb); }
+  .avail .st.t-a2 { --t: var(--a2); --t-rgb: var(--a2-rgb); }
+  .avail .st.t-warn { --t: var(--warn); --t-rgb: var(--warn-rgb); }
+  .avail .st.t-rose { --t: var(--rose); --t-rgb: var(--rose-rgb); }
+  .avail .st.t-dim { --t: var(--muted); --t-rgb: var(--dim-rgb); }
+  .avail .st i { width: 9px; height: 9px; border-radius: 50%; background: var(--t); box-shadow: 0 0 6px rgba(var(--t-rgb),.5); }
+  .avail .st.live i { animation: avail-pulse 2.2s ease-out infinite; }
+  @keyframes avail-pulse { 0% { box-shadow: 0 0 0 0 rgba(var(--t-rgb),.55); } 70% { box-shadow: 0 0 0 9px rgba(var(--t-rgb),0); } 100% { box-shadow: 0 0 0 0 rgba(var(--t-rgb),0); } }
+  @media (prefers-reduced-motion: reduce) { .avail .st.live i { animation: none; box-shadow: 0 0 10px rgba(var(--t-rgb),.6); } }
   @media (max-width: 760px) { .avail { display: flex; flex-direction: column; align-items: stretch; width: 100%; } .avail > span + span { border-left: 0; border-top: 1px solid var(--line); } }
   .chips { display: flex; flex-wrap: wrap; gap: 10px; }
   .chip { font-size: .88rem; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--surface); color: var(--muted); }
