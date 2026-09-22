@@ -9,7 +9,7 @@ hosting + functions, Neon Postgres (via Vercel Storage) for data.
 ```
 public/                     static front-end — the only folder Vercel serves as files
   index.html                the portfolio (hash routes: #/, #/work, #/about, #/what-people-say, #/what-people-say/<id>, #/contact)
-  admin.html                the admin app, served at /admin (login → hub → recommendations / resume / availability)
+  admin.html                the admin app, served at /admin (login → hub → recommendations / resume / availability / career)
   assets/css/site.css       theme tokens (dark + light palettes) + components, shared by both pages
   assets/css/admin.css      admin-only styles
   assets/js/theme.js        shared: dark by default, applies a saved light choice before first paint, wires the toggle
@@ -18,12 +18,14 @@ public/                     static front-end — the only folder Vercel serves a
   assets/js/admin.js        admin: auth, hub routing, Recommendations and Resume modules
   recommendations.json      seed cards; fallback when the API is empty; local-dev store
   availability.json         seed for the Open-to-work badge; fallback until published; local-dev store
+  career.json               seed for the Home timeline roles; fallback until published; local-dev store
   resume/                   committed resume PDF; fallback download; local-dev store
 api/                        Vercel serverless functions (one file = one route)
   auth.js                   GET session status · POST {password} · POST {action:"logout"}
   recommendations.js        GET list (public) · PUT replace list (admin)
   resume.js                 GET download (public) · GET ?meta=1 · PUT replace PDF (admin)
   availability.js           GET badge (public) · PUT replace badge (admin)
+  career.js                 GET roles (public) · PUT replace roles (admin)
 lib/                        server-only code, never served
   db.js                     Neon Postgres storage (tables auto-created) + JSON/file fallback for local dev
   auth.js                   password check + signed HttpOnly session cookie

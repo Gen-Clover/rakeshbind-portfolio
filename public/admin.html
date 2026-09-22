@@ -25,6 +25,7 @@
       <a href="#/recommendations" data-m="recommendations">Recommendations</a>
       <a href="#/resume" data-m="resume">Resume</a>
       <a href="#/availability" data-m="availability">Availability</a>
+      <a href="#/career" data-m="career">Career</a>
     </div>
     <div class="tools">
       <div class="pills">
@@ -81,8 +82,14 @@
           <p>The <em>Open to work</em> badge on the Home, About and Contact pages: status, notice period, location.</p>
           <span class="go">Open</span>
         </a>
-        <div class="card tile soon">
+        <a class="card tile" href="#/career">
           <div class="ico">04</div>
+          <h3>Career</h3>
+          <p>Add, edit or remove roles on the Home page timeline, LinkedIn-style. They order themselves by date.</p>
+          <span class="go">Open</span>
+        </a>
+        <div class="card tile soon">
+          <div class="ico">05</div>
           <h3>More to come</h3>
           <p>New modules plug in here: one tile on this page, one section below, one API route.</p>
         </div>
@@ -216,6 +223,69 @@
         <div class="row2"><div class="f"><label for="avL2">Fact 3 · label <small>(optional)</small></label><input id="avL2" maxlength="30"></div><div class="f"><label for="avV2">Fact 3 · value</label><input id="avV2" maxlength="90"></div></div>
         <div class="row2"><div class="f"><label for="avL3">Fact 4 · label <small>(optional)</small></label><input id="avL3" maxlength="30"></div><div class="f"><label for="avV3">Fact 4 · value</label><input id="avV3" maxlength="90"></div></div>
         <p class="msg" id="avMsg" role="status"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== MODULE: CAREER ==================== -->
+  <section class="view sec" id="m-career">
+    <div class="wrap">
+      <a class="back" href="#/"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 8H4M7.5 4l-4 4 4 4"/></svg> Admin home</a>
+      <div class="head">
+        <span class="label">Career</span>
+        <h2>Experience</h2>
+        <p class="lead">The roles on the Home page timeline. Add one like on LinkedIn; the list orders itself with the most recent role first. Click <b>Publish</b> to make changes live.</p>
+      </div>
+
+      <div class="card adm-top">
+        <div>
+          <div class="status" id="crStatus"></div>
+          <div class="msg" id="crMsg" role="status"></div>
+        </div>
+        <div class="r">
+          <button class="mini" type="button" id="crReload">Reload</button>
+          <button class="mini" type="button" id="crDownload">Download JSON</button>
+          <button class="btn-a" type="button" id="crPublish" disabled>Publish</button>
+        </div>
+      </div>
+
+      <div class="adm-grid">
+        <aside class="card adm-list">
+          <div class="lh"><h3>Roles</h3><button class="mini" type="button" id="crNew">+ Add experience</button></div>
+          <p class="hint">Ordered automatically by date, most recent first.</p>
+          <ul id="crList"></ul>
+        </aside>
+
+        <div class="card adm-form" id="crForm" hidden>
+          <div class="lh"><h3 id="crFormTitle">Edit experience</h3><span class="status" id="crFormId"></span></div>
+          <div class="f"><label for="cTitle">Title <small>(required)</small></label><input id="cTitle" type="text" placeholder="Ex: AI Product Manager"></div>
+          <div class="row2">
+            <div class="f"><label for="cCompany">Company or organization <small>(required)</small></label><input id="cCompany" type="text" placeholder="Ex: Primotech"></div>
+            <div class="f"><label for="cLocation">Location</label><input id="cLocation" type="text" placeholder="Ex: Mohali"></div>
+          </div>
+          <div class="f"><label for="cTeam">Team / role summary <small>(optional, shown under the title)</small></label><input id="cTeam" type="text" placeholder="Ex: Senior Project Lead, Data &amp; AI division"></div>
+          <label class="chk" style="margin-bottom:14px"><input id="cCurrent" type="checkbox"> I am currently working in this role</label>
+          <div class="row2">
+            <div class="f"><label>Start date <small>(required)</small></label><div class="row2"><select id="cSm"><option value="1">Jan</option><option value="2">Feb</option><option value="3">Mar</option><option value="4">Apr</option><option value="5">May</option><option value="6">Jun</option><option value="7">Jul</option><option value="8">Aug</option><option value="9">Sep</option><option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option></select><input id="cSy" type="number" min="1970" max="2100" placeholder="Year"></div></div>
+            <div class="f" id="cEndWrap"><label>End date <small>(required)</small></label><div class="row2"><select id="cEm"><option value="1">Jan</option><option value="2">Feb</option><option value="3">Mar</option><option value="4">Apr</option><option value="5">May</option><option value="6">Jun</option><option value="7">Jul</option><option value="8">Aug</option><option value="9">Sep</option><option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option></select><input id="cEy" type="number" min="1970" max="2100" placeholder="Year"></div></div>
+            <div class="f" id="cEndPresent" hidden><label>End date</label><input type="text" value="Present" disabled></div>
+          </div>
+          <div class="f"><label for="cBullets">Highlights <small>(one per line; shown as bullet points)</small></label><textarea id="cBullets" rows="8"></textarea></div>
+          <div class="f"><label for="cSummary">Summary <small>(optional paragraph, shown above the highlights)</small></label><textarea id="cSummary" rows="3"></textarea></div>
+          <div class="row" style="margin-top:18px">
+            <button class="btn-a" type="button" id="crSave">Save</button>
+            <button class="btn-b" type="button" id="crCancel">Cancel</button>
+            <button class="mini danger" type="button" id="crDelete">Delete</button>
+          </div>
+          <div class="prev">
+            <span class="label" style="margin:26px 0 14px">Preview</span>
+            <ol class="tl one" id="crPreview"></ol>
+          </div>
+        </div>
+
+        <div class="card adm-empty" id="crEmpty">
+          <p>Select a role on the left to edit it, or add a new experience.</p>
+        </div>
       </div>
     </div>
   </section>

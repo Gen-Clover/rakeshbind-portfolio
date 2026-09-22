@@ -5,6 +5,7 @@
  *   #/recommendations  edit the What People Say cards   -> PUT /api/recommendations
  *   #/resume           replace the resume PDF            -> PUT /api/resume
  *   #/availability     edit the Open-to-work badge       -> PUT /api/availability
+ *   #/career           edit the Home page timeline       -> PUT /api/career
  *
  * Adding a module: add a tile + <section class="view" id="m-NAME"> in admin.html, then register
  * it in MODULES below with an optional enter() that loads its data the first time it opens.
@@ -30,7 +31,8 @@
     hub: {},
     recommendations: { enter: function () { Recs.enter(); }, dirty: function () { return Recs.dirty; } },
     resume: { enter: function () { Resume.enter(); } },
-    availability: { enter: function () { Avail.enter(); }, dirty: function () { return Avail.dirty; } }
+    availability: { enter: function () { Avail.enter(); }, dirty: function () { return Avail.dirty; } },
+    career: { enter: function () { Career.enter(); }, dirty: function () { return Career.dirty; } }
   };
 
   function moduleFromHash() {
@@ -81,7 +83,7 @@
   function signOut() {
     if (Recs.dirty && !confirm('You have unpublished changes. Sign out anyway?')) return;
     post(API.auth, { action: 'logout' }).catch(function () {});
-    auth.signedIn = false; current = null; Recs.reset(); Avail.loaded = false; Avail.dirty = false;
+    auth.signedIn = false; current = null; Recs.reset(); Avail.loaded = false; Avail.dirty = false; Career.reset();
     location.hash = '#/';
     route();
     say('#admLoginMsg', 'Signed out.');
@@ -372,13 +374,152 @@
   };
 
   /* ======================================================================
+     Module: career (Home page timeline, LinkedIn-style experiences)
+     ====================================================================== */
+  var Career = {
+    items: [], sel: -1, dirty: false, source: '', loaded: false,
+    reset: function () { Career.items = []; Career.sel = -1; Career.dirty = false; Career.loaded = false; },
+    enter: function () { if (!Career.loaded) Career.load(); },
+    setDirty: function (d) { Career.dirty = d; $('#crPublish').disabled = !d; $('#crPublish').textContent = d ? 'Publish changes' : 'Publish'; },
+    status: function (extra) {
+      $('#crStatus').textContent = Career.items.length + ' role' + (Career.items.length === 1 ? '' : 's') + ' · ' +
+        (Career.source === 'db' ? 'database' : Career.source === 'file' ? 'local file (dev)' : 'built-in copy (never published)') + (extra ? ' · ' + extra : '');
+    },
+    apply: function (doc, source) { Career.items = RB.sortJobs((doc.items || []).map(RB.normJob)); Career.source = source; },
+    load: function () {
+      say('#crMsg', 'Loading…');
+      return getJson(API.career + '?fresh=1', { credentials: 'same-origin', cache: 'no-store' })
+        .catch(function (e) {
+          if (e.status !== 404) throw e;
+          return getJson('career.json?v=' + Date.now(), { cache: 'no-store' }).then(function (d) { d.source = ''; return d; });
+        })
+        .then(function (doc) {
+          Career.apply(doc, doc.source || 'db'); Career.loaded = true;
+          Career.setDirty(false); Career.status(); Career.close();
+          say('#crMsg', 'Loaded ' + Career.items.length + ' roles.', 'ok');
+        })
+        .catch(function (e) { say('#crMsg', 'Load failed: ' + esc(e.message), 'err'); });
+    },
+    publish: function () {
+      if (!Career.dirty) return;
+      $('#crPublish').disabled = true; say('#crMsg', 'Publishing…');
+      put(API.career, { items: Career.items })
+        .then(function (doc) {
+          Career.apply(doc, doc.source || 'db'); Career.setDirty(false); Career.status('saved ' + new Date().toLocaleTimeString()); Career.renderList();
+          say('#crMsg', 'Published. The Home page timeline is showing the new roles now.', 'ok');
+        })
+        .catch(function (e) {
+          $('#crPublish').disabled = false;
+          if (e.status === 401) { expired(); return; }
+          say('#crMsg', 'Publish failed: ' + esc(e.message), 'err');
+        });
+    },
+    download: function () {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([JSON.stringify({ updated: new Date().toISOString().slice(0, 10), items: Career.items }, null, 2) + '\n'], { type: 'application/json' }));
+      a.download = 'career.json'; document.body.appendChild(a); a.click(); a.remove();
+    },
+    renderList: function () {
+      $('#crList').innerHTML = Career.items.map(function (j, i) {
+        return '<li data-i="' + i + '" class="' + (i === Career.sel ? 'sel' : '') + '">' +
+          '<span class="n">' + (i + 1) + '</span>' +
+          '<span class="nm">' + esc(j.title) + ' - ' + esc(j.company) + '<small>' + esc(RB.jobWhen(j)) + '</small></span>' +
+          (j.current ? '<span class="tag">current</span>' : '') +
+          '</li>';
+      }).join('') || '<li style="cursor:default;color:var(--dim)">No roles yet. Click "+ Add experience".</li>';
+    },
+    /* LinkedIn behaviour: ticking "currently working" hides the end date and shows "Present" */
+    toggleEnd: function () {
+      var cur = $('#cCurrent').checked;
+      $('#cEndWrap').hidden = cur; $('#cEndPresent').hidden = !cur;
+    },
+    fill: function (j) {
+      $('#cTitle').value = j.title; $('#cCompany').value = j.company; $('#cLocation').value = j.location; $('#cTeam').value = j.team;
+      $('#cCurrent').checked = j.current;
+      $('#cSm').value = j.sm; $('#cSy').value = j.sy;
+      $('#cEm').value = j.em || new Date().getMonth() + 1; $('#cEy').value = j.ey || new Date().getFullYear();
+      $('#cBullets').value = j.bullets.join('\n'); $('#cSummary').value = j.summary;
+      Career.toggleEnd();
+    },
+    read: function () {
+      var base = Career.sel >= 0 ? Career.items[Career.sel] : {};
+      return RB.normJob({
+        id: base.id, title: $('#cTitle').value.trim(), company: $('#cCompany').value.trim(), location: $('#cLocation').value.trim(), team: $('#cTeam').value.trim(),
+        current: $('#cCurrent').checked, sm: $('#cSm').value, sy: $('#cSy').value, em: $('#cEm').value, ey: $('#cEy').value,
+        bullets: $('#cBullets').value, summary: $('#cSummary').value.trim()
+      });
+    },
+    problems: function (j) {
+      var p = [];
+      if (!j.title) p.push('Title is required.');
+      if (!j.company) p.push('Company is required.');
+      if (!(j.sy >= 1970 && j.sy <= 2100)) p.push('Start year must be between 1970 and 2100.');
+      if (!j.current) {
+        if (!(j.ey >= 1970 && j.ey <= 2100)) p.push('End year must be between 1970 and 2100, or tick "currently working".');
+        else if (j.ey * 12 + j.em < j.sy * 12 + j.sm) p.push('The end date is before the start date.');
+      }
+      return p;
+    },
+    preview: function () {
+      var j = Career.read();
+      $('#crPreview').innerHTML = RB.jobItem(j).replace(/^<li( class="d")?/, function (m, d) { return '<li class="on' + (d ? ' d' : '') + '"'; });
+    },
+    edit: function (i) {
+      Career.sel = i;
+      var j = i >= 0 ? Career.items[i] : RB.normJob({ current: true, sm: new Date().getMonth() + 1, sy: new Date().getFullYear() });
+      $('#crFormTitle').textContent = i >= 0 ? 'Edit experience' : 'Add experience';
+      $('#crFormId').textContent = i >= 0 ? j.id : '';
+      $('#crDelete').hidden = i < 0;
+      Career.fill(j); Career.preview();
+      $('#crForm').hidden = false; $('#crEmpty').hidden = true;
+      Career.renderList();
+      if (window.innerWidth <= 1000) $('#crForm').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    },
+    close: function () { Career.sel = -1; $('#crForm').hidden = true; $('#crEmpty').hidden = false; Career.renderList(); },
+    save: function () {
+      var j = Career.read(), p = Career.problems(j);
+      if (p.length) { say('#crMsg', esc(p[0]), 'err'); return; }
+      if (Career.sel >= 0) Career.items[Career.sel] = j; else Career.items.push(j);
+      Career.items = RB.sortJobs(Career.items);          // re-sort so a new or re-dated role lands in the right place
+      Career.sel = Career.items.indexOf(j);
+      Career.setDirty(true); Career.renderList(); Career.status();
+      $('#crFormId').textContent = j.id; $('#crFormTitle').textContent = 'Edit experience'; $('#crDelete').hidden = false;
+      say('#crMsg', 'Saved "' + esc(j.title) + '" in the editor. Click Publish to make it live.', 'ok');
+    },
+    remove: function () {
+      if (Career.sel < 0 || !confirm('Delete this role? It is removed from the site when you publish.')) return;
+      Career.items.splice(Career.sel, 1); Career.setDirty(true); Career.close(); Career.status();
+    },
+    init: function () {
+      $('#crReload').addEventListener('click', function () {
+        if (Career.dirty && !confirm('Discard unpublished changes and reload?')) return;
+        Career.load();
+      });
+      $('#crDownload').addEventListener('click', Career.download);
+      $('#crPublish').addEventListener('click', Career.publish);
+      $('#crNew').addEventListener('click', function () { Career.edit(-1); });
+      $('#crList').addEventListener('click', function (e) {
+        var li = e.target.closest('li[data-i]'); if (li) Career.edit(parseInt(li.dataset.i, 10));
+      });
+      $$('#crForm input, #crForm select, #crForm textarea').forEach(function (el) {
+        el.addEventListener('input', Career.preview); el.addEventListener('change', Career.preview);
+      });
+      $('#cCurrent').addEventListener('change', Career.toggleEnd);
+      $('#crSave').addEventListener('click', Career.save);
+      $('#crCancel').addEventListener('click', Career.close);
+      $('#crDelete').addEventListener('click', Career.remove);
+    }
+  };
+
+  /* ======================================================================
      Boot
      ====================================================================== */
   $('#admLogin').addEventListener('submit', signIn);
   $('#admSignOut').addEventListener('click', signOut);
-  window.addEventListener('beforeunload', function (e) { if (Recs.dirty || Avail.dirty) { e.preventDefault(); e.returnValue = ''; } });
+  window.addEventListener('beforeunload', function (e) { if (Recs.dirty || Avail.dirty || Career.dirty) { e.preventDefault(); e.returnValue = ''; } });
   Recs.init();
   Resume.init();
   Avail.init();
+  Career.init();
   checkSession();
 })();

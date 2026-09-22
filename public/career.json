@@ -1,0 +1,62 @@
+{
+  "updated": "2026-09-22",
+  "items": [
+    {
+      "id": "primotech",
+      "title": "AI Product Owner, AI Product Manager, Solution Architect",
+      "company": "Primotech",
+      "team": "Senior Project Lead, Data & AI division",
+      "location": "Mohali",
+      "sm": 6, "sy": 2023, "current": false, "em": 8, "ey": 2026,
+      "bullets": [
+        "Lead AI, web development, data engineering and BI teams delivering enterprise AI, data and digital products for global clients.",
+        "Own end-to-end product delivery across business discovery, requirements, product workflows, solution architecture, development, UAT, stakeholder sign-off and production delivery.",
+        "Translate complex business and operational problems into AI-enabled product capabilities, functional requirements, technical workflows and executable engineering backlogs.",
+        "Lead product and solution architecture across Generative AI, AI agents, AI/ML, APIs, Google Cloud, data platforms, analytics and web applications.",
+        "Collaborate with AI engineers, software developers, data engineers, BI teams, business stakeholders and clients to align technical execution with product outcomes.",
+        "Manage product/project roadmaps, priorities, dependencies, risks, timelines and stakeholder communication.",
+        "Lead client discovery, solution scoping, technical discussions, pre-sales and proposal development for AI, data and analytics engagements.",
+        "Lead product demos and communicate AI solution capabilities, value propositions and technical trade-offs to business and client stakeholders."
+      ],
+      "summary": ""
+    },
+    {
+      "id": "integration-international",
+      "title": "Project Lead, AI & Analytics Products",
+      "company": "Integration International",
+      "team": "RDE, Cross-functional BI, data engineering and ML delivery",
+      "location": "Pune",
+      "sm": 7, "sy": 2021, "current": false, "em": 2, "ey": 2023,
+      "bullets": [
+        "Medical Data Intelligence Platform: Power BI reporting, sales prediction models, OCR document processing and data governance",
+        "Workpod workforce intelligence: talent analytics, candidate matching logic and real-time KPI dashboards",
+        "Owned requirements, solution design, sprint execution and stakeholder delivery"
+      ],
+      "summary": ""
+    },
+    {
+      "id": "rangam-consultants",
+      "title": "Data Analyst & Power BI / ML Analyst",
+      "company": "Rangam Consultants",
+      "team": "Product analytics for the SourcePros ATS platform",
+      "location": "Vadodara",
+      "sm": 9, "sy": 2019, "current": false, "em": 7, "ey": 2021,
+      "bullets": [
+        "Defined and tracked Time-to-Fill, Submission-to-Success, recruiter productivity and client delivery efficiency",
+        "Built interactive Power BI dashboards with advanced DAX and data modelling",
+        "Applied ML to recruiter performance prediction and hiring-trend analysis"
+      ],
+      "summary": ""
+    },
+    {
+      "id": "acs-global-tech-solutions",
+      "title": "Graduate Trainee",
+      "company": "ACS Global Tech Solutions",
+      "team": "Campus placement program",
+      "location": "Noida",
+      "sm": 1, "sy": 2019, "current": false, "em": 8, "ey": 2019,
+      "bullets": [],
+      "summary": "First exposure to corporate delivery and client communication, then a deliberate move into core computer science, data and AI/ML work."
+    }
+  ]
+}

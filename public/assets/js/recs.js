@@ -5,7 +5,7 @@
  */
 (function () {
   var REL = { d: 'Direct report', p: 'Team peer', x: 'Cross-team', s: 'Senior colleague' };
-  var API = { recs: '/api/recommendations', auth: '/api/auth', resume: '/api/resume', avail: '/api/availability' };
+  var API = { recs: '/api/recommendations', auth: '/api/auth', resume: '/api/resume', avail: '/api/availability', career: '/api/career' };
   var LI_RECS = 'https://www.linkedin.com/in/rakesh-bind-2a797333b/details/recommendations/?detailScreenTabIndex=0';
   var EXT = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12 12 4M6 4h6v6"/></svg>';
 
@@ -77,6 +77,41 @@
       (doc.facts || []).map(function (f) { return '<span class="fact"><small>' + esc(f.label) + '</small>' + esc(f.value) + '</span>'; }).join('');
   }
 
+  /* ---------- Career timeline (Home) ---------- */
+  var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function normJob(j) {
+    j = j || {};
+    var lines = function (v) { return Array.isArray(v) ? v : String(v || '').split(/\r?\n/); };
+    var current = !!j.current;
+    return {
+      id: j.id || String(j.company || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || ('job-' + Date.now()),
+      title: j.title || '', company: j.company || '', team: j.team || '', location: j.location || '',
+      sm: parseInt(j.sm, 10) || 1, sy: parseInt(j.sy, 10) || new Date().getFullYear(),
+      current: current,
+      em: current ? null : (parseInt(j.em, 10) || 1), ey: current ? null : (parseInt(j.ey, 10) || new Date().getFullYear()),
+      bullets: lines(j.bullets).map(function (s) { return s.trim(); }).filter(Boolean),
+      summary: j.summary || ''
+    };
+  }
+  /* Most recent first: current roles, then by end date, then by start date */
+  function sortJobs(list) {
+    var endKey = function (j) { return j.current ? 999999 : j.ey * 12 + j.em; };
+    var startKey = function (j) { return j.sy * 12 + j.sm; };
+    return list.slice().sort(function (a, b) { return (endKey(b) - endKey(a)) || (startKey(b) - startKey(a)); });
+  }
+  function jobWhen(j) {
+    return MONTHS[j.sm - 1] + ' ' + j.sy + ' \u2013 ' + (j.current ? 'Present' : MONTHS[j.em - 1] + ' ' + j.ey) + (j.location ? ' \u00b7 ' + j.location : '');
+  }
+  function jobItem(j) {
+    return '<li' + (j.current ? ' class="d"' : '') + ' data-id="' + esc(j.id) + '">' +
+      '<span class="when">' + esc(jobWhen(j)) + '</span>' +
+      '<h3>' + esc(j.title) + (j.company ? ' - ' + esc(j.company) : '') + '</h3>' +
+      (j.team ? '<p class="where">' + esc(j.team) + '</p>' : '') +
+      (j.summary ? '<p>' + esc(j.summary) + '</p>' : '') +
+      (j.bullets.length ? '<ul>' + j.bullets.map(function (b) { return '<li>' + esc(b) + '</li>'; }).join('') + '</ul>' : '') +
+      '</li>';
+  }
+
   /* fetch() that always resolves to parsed JSON and throws Error(message){status} on failure */
   function getJson(url, opt) {
     return fetch(url, opt).then(function (r) {
@@ -88,5 +123,5 @@
     });
   }
 
-  window.RB = { REL: REL, API: API, LI_RECS: LI_RECS, EXT: EXT, esc: esc, initialsOf: initialsOf, paras: paras, listNames: listNames, fmtBytes: fmtBytes, pullQuote: pullQuote, normRec: normRec, normDoc: normDoc, recCard: recCard, STATUS: STATUS, statusOf: statusOf, availBadge: availBadge, getJson: getJson };
+  window.RB = { REL: REL, API: API, LI_RECS: LI_RECS, EXT: EXT, esc: esc, initialsOf: initialsOf, paras: paras, listNames: listNames, fmtBytes: fmtBytes, pullQuote: pullQuote, normRec: normRec, normDoc: normDoc, recCard: recCard, STATUS: STATUS, statusOf: statusOf, availBadge: availBadge, MONTHS: MONTHS, normJob: normJob, sortJobs: sortJobs, jobWhen: jobWhen, jobItem: jobItem, getJson: getJson };
 })();

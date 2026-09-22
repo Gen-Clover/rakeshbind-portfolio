@@ -63,6 +63,26 @@
       .catch(function () {});
   }
 
+  /* ---------- Career timeline ---------- */
+  /* Roles come from the API (edited in the admin), sorted most recent first. The inline copy in
+     #careerFallback paints immediately; the published list replaces it when it arrives. */
+  function renderCareer(doc) {
+    var ol = $('#tl');
+    if (!ol || !doc || !Array.isArray(doc.items)) return;
+    ol.innerHTML = RB.sortJobs(doc.items.map(RB.normJob)).map(RB.jobItem).join('');
+    if (activeView && activeView.id === 'v-home') initScroll(activeView);   // re-measure the scroll-driven highlight
+  }
+  (function () {
+    var inline = { items: [] };
+    try { inline = JSON.parse($('#careerFallback').textContent); } catch (e) {}
+    renderCareer(inline);
+    if (location.protocol === 'file:' || !window.fetch) return;
+    getJson(API.career, { credentials: 'same-origin' })
+      .catch(function () { return getJson('career.json?v=' + Date.now(), { cache: 'no-store' }); })
+      .then(function (doc) { if (JSON.stringify(doc.items) !== JSON.stringify(inline.items)) renderCareer(doc); })
+      .catch(function () {});
+  })();
+
   /* ---------- "Next case study" footers ---------- */
   /* Each study ends with [data-next="#/work/..."]; the card is built from that study's entry on the
      Work page so titles and blurbs are written once. */
