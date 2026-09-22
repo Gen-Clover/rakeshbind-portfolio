@@ -17,11 +17,13 @@ public/                     static front-end — the only folder Vercel serves a
   assets/js/site.js         public site: routing, animations, loads cards from the API
   assets/js/admin.js        admin: auth, hub routing, Recommendations and Resume modules
   recommendations.json      seed cards; fallback when the API is empty; local-dev store
+  availability.json         seed for the Open-to-work badge; fallback until published; local-dev store
   resume/                   committed resume PDF; fallback download; local-dev store
 api/                        Vercel serverless functions (one file = one route)
   auth.js                   GET session status · POST {password} · POST {action:"logout"}
   recommendations.js        GET list (public) · PUT replace list (admin)
   resume.js                 GET download (public) · GET ?meta=1 · PUT replace PDF (admin)
+  availability.js           GET badge (public) · PUT replace badge (admin)
 lib/                        server-only code, never served
   db.js                     Neon Postgres storage (tables auto-created) + JSON/file fallback for local dev
   auth.js                   password check + signed HttpOnly session cookie
