@@ -39,18 +39,29 @@
   }
 
   /* ---------- Availability badge ---------- */
-  /* One place to update; rendered into every [data-avail] (home, about and contact heroes). */
+  /* Rendered into every [data-avail] (home, about and contact heroes). The built-in copy paints
+     first; the admin's published version (API, or availability.json in local dev) replaces it. */
   var AVAIL = {
+    show: true,
     status: 'Open to work',
     facts: [
-      ['Notice period', 'Can join immediately'],
-      ['Location', 'Global \u00b7 onsite, relocate or remote']
+      { label: 'Notice period', value: 'Can join immediately' },
+      { label: 'Location', value: 'Global \u00b7 onsite, relocate or remote' }
     ]
   };
-  $$('[data-avail]').forEach(function (el) {
-    el.innerHTML = '<span class="st"><i></i>' + esc(AVAIL.status) + '</span>' +
-      AVAIL.facts.map(function (f) { return '<span class="fact"><small>' + esc(f[0]) + '</small>' + esc(f[1]) + '</span>'; }).join('');
-  });
+  function renderAvail(doc) {
+    $$('[data-avail]').forEach(function (el) {
+      el.hidden = doc.show === false;
+      el.innerHTML = RB.availBadge(doc);
+    });
+  }
+  renderAvail(AVAIL);
+  if (location.protocol !== 'file:' && window.fetch) {
+    getJson(API.avail, { credentials: 'same-origin' })
+      .catch(function () { return getJson('availability.json?v=' + Date.now(), { cache: 'no-store' }); })
+      .then(function (doc) { if (doc && doc.status) renderAvail(doc); })
+      .catch(function () {});
+  }
 
   /* ---------- "Next case study" footers ---------- */
   /* Each study ends with [data-next="#/work/..."]; the card is built from that study's entry on the

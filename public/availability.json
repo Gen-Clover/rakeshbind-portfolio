@@ -1,0 +1,9 @@
+{
+  "show": true,
+  "status": "Open to work",
+  "facts": [
+    { "label": "Notice period", "value": "Can join immediately" },
+    { "label": "Location", "value": "Global · onsite, relocate or remote" }
+  ],
+  "updated": "2026-09-22"
+}

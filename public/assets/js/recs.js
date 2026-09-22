@@ -5,7 +5,7 @@
  */
 (function () {
   var REL = { d: 'Direct report', p: 'Team peer', x: 'Cross-team', s: 'Senior colleague' };
-  var API = { recs: '/api/recommendations', auth: '/api/auth', resume: '/api/resume' };
+  var API = { recs: '/api/recommendations', auth: '/api/auth', resume: '/api/resume', avail: '/api/availability' };
   var LI_RECS = 'https://www.linkedin.com/in/rakesh-bind-2a797333b/details/recommendations/?detailScreenTabIndex=0';
   var EXT = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12 12 4M6 4h6v6"/></svg>';
 
@@ -60,6 +60,12 @@
       '</article>';
   }
 
+  /* Availability badge markup (home/about/contact heroes and the admin preview). */
+  function availBadge(doc) {
+    return '<span class="st"><i></i>' + esc(doc.status) + '</span>' +
+      (doc.facts || []).map(function (f) { return '<span class="fact"><small>' + esc(f.label) + '</small>' + esc(f.value) + '</span>'; }).join('');
+  }
+
   /* fetch() that always resolves to parsed JSON and throws Error(message){status} on failure */
   function getJson(url, opt) {
     return fetch(url, opt).then(function (r) {
@@ -71,5 +77,5 @@
     });
   }
 
-  window.RB = { REL: REL, API: API, LI_RECS: LI_RECS, EXT: EXT, esc: esc, initialsOf: initialsOf, paras: paras, listNames: listNames, fmtBytes: fmtBytes, pullQuote: pullQuote, normRec: normRec, normDoc: normDoc, recCard: recCard, getJson: getJson };
+  window.RB = { REL: REL, API: API, LI_RECS: LI_RECS, EXT: EXT, esc: esc, initialsOf: initialsOf, paras: paras, listNames: listNames, fmtBytes: fmtBytes, pullQuote: pullQuote, normRec: normRec, normDoc: normDoc, recCard: recCard, availBadge: availBadge, getJson: getJson };
 })();

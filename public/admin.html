@@ -24,6 +24,7 @@
       <a href="#/" data-m="hub">Home</a>
       <a href="#/recommendations" data-m="recommendations">Recommendations</a>
       <a href="#/resume" data-m="resume">Resume</a>
+      <a href="#/availability" data-m="availability">Availability</a>
     </div>
     <div class="tools">
       <div class="pills">
@@ -74,8 +75,14 @@
           <p>Replace the PDF behind the <em>Get my resume</em> button in the site header.</p>
           <span class="go" id="tileResume">Open</span>
         </a>
-        <div class="card tile soon">
+        <a class="card tile" href="#/availability">
           <div class="ico">03</div>
+          <h3>Availability</h3>
+          <p>The <em>Open to work</em> badge on the Home, About and Contact pages: status, notice period, location.</p>
+          <span class="go">Open</span>
+        </a>
+        <div class="card tile soon">
+          <div class="ico">04</div>
           <h3>More to come</h3>
           <p>New modules plug in here: one tile on this page, one section below, one API route.</p>
         </div>
@@ -176,6 +183,39 @@
           <a class="mini" href="/api/resume" id="admResumeDl" download>Download current</a>
         </div>
         <p class="msg" id="admResumeMsg" role="status"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== MODULE: AVAILABILITY ==================== -->
+  <section class="view sec" id="m-availability">
+    <div class="wrap">
+      <a class="back" href="#/"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 8H4M7.5 4l-4 4 4 4"/></svg> Admin home</a>
+      <div class="head">
+        <span class="label">Availability</span>
+        <h2>Open to work badge</h2>
+        <p class="lead">Shown under the intro on the Home, About and Contact pages. Leave a fact row empty to drop it; untick "Show" to hide the badge everywhere.</p>
+      </div>
+
+      <div class="card adm-top">
+        <div><b style="display:block">Live preview</b><div class="avail" id="avPreview" style="margin:12px 0 0"></div></div>
+        <div class="r">
+          <span class="status" id="avStatus">Loading…</span>
+          <button class="mini" type="button" id="avReload">Reload</button>
+          <button class="btn-a" type="button" id="avPublish" disabled>Publish</button>
+        </div>
+      </div>
+
+      <div class="card adm-form">
+        <div class="row2">
+          <div class="f"><label for="avText">Status text</label><input id="avText" maxlength="40" placeholder="Open to work"></div>
+          <div class="f" style="align-self:end"><label class="chk" style="margin-bottom:12px"><input id="avShow" type="checkbox" checked> Show the badge on the site</label></div>
+        </div>
+        <div class="row2"><div class="f"><label for="avL0">Fact 1 · label</label><input id="avL0" maxlength="30" placeholder="Notice period"></div><div class="f"><label for="avV0">Fact 1 · value</label><input id="avV0" maxlength="90" placeholder="Can join immediately"></div></div>
+        <div class="row2"><div class="f"><label for="avL1">Fact 2 · label</label><input id="avL1" maxlength="30" placeholder="Location"></div><div class="f"><label for="avV1">Fact 2 · value</label><input id="avV1" maxlength="90" placeholder="Global · onsite, relocate or remote"></div></div>
+        <div class="row2"><div class="f"><label for="avL2">Fact 3 · label <small>(optional)</small></label><input id="avL2" maxlength="30"></div><div class="f"><label for="avV2">Fact 3 · value</label><input id="avV2" maxlength="90"></div></div>
+        <div class="row2"><div class="f"><label for="avL3">Fact 4 · label <small>(optional)</small></label><input id="avL3" maxlength="30"></div><div class="f"><label for="avV3">Fact 4 · value</label><input id="avV3" maxlength="90"></div></div>
+        <p class="msg" id="avMsg" role="status"></p>
       </div>
     </div>
   </section>

@@ -465,9 +465,13 @@
 
   .end { padding: 140px 0 100px; text-align: left; }
   .end .statement { max-width: 22ch; margin-bottom: 0; font-size: clamp(2rem, 5vw, 4rem); }
-  .foot { border-top: 1px solid var(--line); padding-top: 28px; padding-bottom: 40px; color: var(--dim); font-size: .85rem; font-family: var(--mono); display: flex; flex-wrap: wrap; gap: 10px 28px; justify-content: space-between; }
+  /* Always-visible contact bar pinned to the bottom of the viewport; body padding keeps content clear of it */
+  .foot { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; border-top: 1px solid var(--line); background: rgba(var(--bg-rgb),var(--nav-alpha)); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); color: var(--dim); font-size: .82rem; font-family: var(--mono); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .foot .wrap { display: flex; flex-wrap: wrap; gap: 6px 28px; justify-content: space-between; align-items: center; min-height: 44px; padding-top: 8px; padding-bottom: 8px; }
+  body { padding-bottom: calc(46px + env(safe-area-inset-bottom, 0px)); }
   .foot a { color: var(--dim); text-decoration: none; }
   .foot a:hover { color: var(--ink); }
+  @media (max-width: 760px) { .foot .wrap > div:first-child { display: none; } .foot .wrap { justify-content: center; } }   /* phones: just the contact links, one line */
 
   /* ---------- What People Say (LinkedIn recommendations) ---------- */
   .rec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; align-items: start; }

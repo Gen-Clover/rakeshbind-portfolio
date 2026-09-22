@@ -4,6 +4,7 @@
  *   #/                 hub: one tile per module
  *   #/recommendations  edit the What People Say cards   -> PUT /api/recommendations
  *   #/resume           replace the resume PDF            -> PUT /api/resume
+ *   #/availability     edit the Open-to-work badge       -> PUT /api/availability
  *
  * Adding a module: add a tile + <section class="view" id="m-NAME"> in admin.html, then register
  * it in MODULES below with an optional enter() that loads its data the first time it opens.
@@ -28,7 +29,8 @@
   var MODULES = {
     hub: {},
     recommendations: { enter: function () { Recs.enter(); }, dirty: function () { return Recs.dirty; } },
-    resume: { enter: function () { Resume.enter(); } }
+    resume: { enter: function () { Resume.enter(); } },
+    availability: { enter: function () { Avail.enter(); }, dirty: function () { return Avail.dirty; } }
   };
 
   function moduleFromHash() {
@@ -79,7 +81,7 @@
   function signOut() {
     if (Recs.dirty && !confirm('You have unpublished changes. Sign out anyway?')) return;
     post(API.auth, { action: 'logout' }).catch(function () {});
-    auth.signedIn = false; current = null; Recs.reset();
+    auth.signedIn = false; current = null; Recs.reset(); Avail.loaded = false; Avail.dirty = false;
     location.hash = '#/';
     route();
     say('#admLoginMsg', 'Signed out.');
@@ -301,12 +303,82 @@
   };
 
   /* ======================================================================
+     Module: availability (the "Open to work" badge)
+     ====================================================================== */
+  var Avail = {
+    loaded: false, dirty: false, doc: null,
+    enter: function () { if (!Avail.loaded) Avail.load(); },
+    read: function () {
+      var facts = [];
+      for (var i = 0; i < 4; i++) {
+        var l = $('#avL' + i).value.trim(), v = $('#avV' + i).value.trim();
+        if (l || v) facts.push({ label: l, value: v });
+      }
+      return { show: $('#avShow').checked, status: $('#avText').value.trim(), facts: facts };
+    },
+    fill: function (doc) {
+      $('#avText').value = doc.status || '';
+      $('#avShow').checked = doc.show !== false;
+      for (var i = 0; i < 4; i++) {
+        var f = (doc.facts || [])[i] || {};
+        $('#avL' + i).value = f.label || ''; $('#avV' + i).value = f.value || '';
+      }
+      Avail.preview();
+    },
+    preview: function () {
+      var doc = Avail.read(), p = $('#avPreview');
+      p.innerHTML = RB.availBadge(doc);
+      p.style.opacity = doc.show ? '' : '.35';
+      var problems = [];
+      if (!doc.status) problems.push('Status text is required.');
+      doc.facts.forEach(function (f, i) { if (!f.label || !f.value) problems.push('Fact ' + (i + 1) + ' needs both a label and a value.'); });
+      say('#avMsg', problems.length ? esc(problems.join(' ')) : (Avail.dirty ? 'Unpublished changes.' : ''), problems.length ? 'err' : '');
+      $('#avPublish').disabled = !Avail.dirty || problems.length > 0;
+    },
+    setDirty: function (d) { Avail.dirty = d; Avail.preview(); },
+    status: function (doc) {
+      $('#avStatus').textContent = doc && doc.updated ? 'Published ' + doc.updated + ' · ' + (doc.source === 'db' ? 'database' : 'local file (dev)') : 'Using the site\u2019s built-in copy (never published)';
+    },
+    load: function () {
+      $('#avStatus').textContent = 'Loading…';
+      getJson(API.avail + '?fresh=1', { credentials: 'same-origin', cache: 'no-store' })
+        .catch(function (e) {
+          if (e.status !== 404) throw e;
+          return getJson('availability.json?v=' + Date.now(), { cache: 'no-store' }).then(function (d) { d.updated = null; return d; });
+        })
+        .then(function (doc) { Avail.loaded = true; Avail.doc = doc; Avail.fill(doc); Avail.status(doc); Avail.dirty = false; Avail.preview(); })
+        .catch(function (e) { say('#avMsg', 'Load failed: ' + esc(e.message), 'err'); $('#avStatus').textContent = 'Could not load'; });
+    },
+    publish: function () {
+      var btn = $('#avPublish'); btn.disabled = true; say('#avMsg', 'Publishing…');
+      put(API.avail, Avail.read())
+        .then(function (doc) { Avail.doc = doc; Avail.dirty = false; Avail.status(doc); Avail.preview(); say('#avMsg', 'Published. The badge is live on the site.', 'ok'); })
+        .catch(function (e) {
+          if (e.status === 401) { expired(); return; }
+          say('#avMsg', 'Publish failed: ' + esc(e.message), 'err'); btn.disabled = false;
+        });
+    },
+    init: function () {
+      $$('#m-availability input').forEach(function (el) {
+        el.addEventListener('input', function () { Avail.setDirty(true); });
+        el.addEventListener('change', function () { Avail.setDirty(true); });
+      });
+      $('#avPublish').addEventListener('click', Avail.publish);
+      $('#avReload').addEventListener('click', function () {
+        if (Avail.dirty && !confirm('Discard unpublished changes and reload?')) return;
+        Avail.loaded = false; Avail.dirty = false; Avail.load();
+      });
+    }
+  };
+
+  /* ======================================================================
      Boot
      ====================================================================== */
   $('#admLogin').addEventListener('submit', signIn);
   $('#admSignOut').addEventListener('click', signOut);
-  window.addEventListener('beforeunload', function (e) { if (Recs.dirty) { e.preventDefault(); e.returnValue = ''; } });
+  window.addEventListener('beforeunload', function (e) { if (Recs.dirty || Avail.dirty) { e.preventDefault(); e.returnValue = ''; } });
   Recs.init();
   Resume.init();
+  Avail.init();
   checkSession();
 })();
