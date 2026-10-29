@@ -405,12 +405,32 @@
   .proj.wide { grid-column: 1 / -1; }
 
   /* ---------- Case study sub-nav ---------- */
-  .crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 24px 0 0; }
-  .back { display: inline-flex; align-items: center; gap: 8px; font-size: .9rem; font-weight: 500; color: var(--muted); text-decoration: none; padding: 7px 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); transition: color .25s, border-color .25s; }
+  /* Case-study bar: sticks under the header while reading. The 1px sentinel above it lets JS know
+     when it is actually pinned (.stuck), so the border and blur only appear then. */
+  .crumbs-sentinel { display: block; height: 1px; margin-bottom: -1px; }
+  .crumbs { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 72px); z-index: 40; margin-top: 24px; padding: 10px 0; transition: background .25s, border-color .25s; border-bottom: 1px solid transparent; }
+  .crumbs.stuck { background: rgba(var(--bg-rgb),var(--nav-alpha)); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom-color: var(--line); }
+  .crumbs .wrap { display: flex; align-items: center; gap: 10px 18px; }
+  .back { display: inline-flex; align-items: center; gap: 8px; flex: none; font-size: .9rem; font-weight: 500; color: var(--muted); text-decoration: none; padding: 7px 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); transition: color .25s, border-color .25s; }
   .back:hover { color: var(--ink); border-color: rgba(var(--a1-rgb),.45); }
-  .jump { display: flex; flex-wrap: wrap; gap: 8px; }
-  .jump a { font-size: .82rem; font-family: var(--mono); letter-spacing: .06em; color: var(--dim); text-decoration: none; padding: 7px 14px; border-radius: 999px; border: 1px solid transparent; transition: color .25s, border-color .25s, background .25s; }
+  .jump { display: flex; flex: 1 1 auto; gap: 8px; min-width: 0; overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); }
+  .jump::-webkit-scrollbar { display: none; }
+  .jump a { flex: none; font-size: .82rem; font-family: var(--mono); letter-spacing: .06em; color: var(--dim); text-decoration: none; padding: 7px 14px; border-radius: 999px; border: 1px solid transparent; transition: color .25s, border-color .25s, background .25s; }
   .jump a:hover { color: var(--ink); border-color: var(--line-2); background: var(--surface); }
+  .jump a.act { color: var(--a1); border-color: rgba(var(--a1-rgb),.45); background: var(--a1-soft); }
+  .rt-live { flex: none; font-family: var(--mono); font-size: .74rem; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); white-space: nowrap; }
+  .rt-live.done { color: var(--ok); }
+  .view[id^="v-cs-"] .sec[id] { scroll-margin-top: 64px; }   /* + the html scroll-padding (88px) = below the pinned bar */
+  /* Reading-time chip next to the study label in the hero */
+  .rt { display: inline-flex; align-items: center; gap: 8px; margin-left: 14px; font-family: var(--mono); font-size: .74rem; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+  .rt::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--dim); }
+  @media (max-width: 760px) {
+    .crumbs { margin-top: 16px; padding: 8px 0; }
+    .crumbs .wrap { gap: 8px 12px; }
+    .back { padding: 7px 12px; font-size: .82rem; }
+    .view[id^="v-cs-"] .sec[id] { scroll-margin-top: 56px; }
+    .rt { display: flex; margin: 10px 0 0; }
+  }
 
   /* ---------- Compare (legacy vs modern) ---------- */
   .vs { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
@@ -482,7 +502,9 @@
   body { padding-bottom: calc(46px + env(safe-area-inset-bottom, 0px)); }
   .foot a { color: var(--dim); text-decoration: none; }
   .foot a:hover { color: var(--ink); }
-  @media (max-width: 760px) { .foot .wrap > div:first-child { display: none; } .foot .wrap { justify-content: center; } }   /* phones: just the contact links, one line */
+  .foot .sep { margin: 0 8px; }
+  @media (max-width: 760px) { .foot { font-size: .78rem; } .foot .wrap > div:first-child { display: none; } .foot .wrap { justify-content: center; } .foot .wrap > div { white-space: nowrap; } }   /* phones: just the contact links, one line */
+  @media (max-width: 420px) { .foot .tel { display: none; } }   /* narrow phones: email and LinkedIn only */
 
   /* ---------- What People Say (LinkedIn recommendations) ---------- */
   .rec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; align-items: start; }

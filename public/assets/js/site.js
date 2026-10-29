@@ -102,6 +102,82 @@
       '<p class="note"><a href="#/work">\u2190 All work</a></p>';
   });
 
+  /* ---------- Case studies: reading time, sticky bar, active section ---------- */
+  /* The estimate is derived from the page itself, never typed in: visible prose words at an adult
+     silent-reading rate (238 wpm, Brysbaert 2019), plus a pause per figure the reader will stop on.
+     Each section's words are cached with it, so the bar can also say how much is left. */
+  var WPM = 238, FIGURE_SECS = { '.stage': 20, '.win': 10, 'table': 5 };
+  var SKIP = 'svg, script, style, noscript, .crumbs, .crumbs-sentinel, .next-wrap, .rt, .rt-live, .cap, .ctl';
+  function wordsIn(el) {
+    var clone = el.cloneNode(true);
+    $$(SKIP, clone).forEach(function (n) { n.parentNode.removeChild(n); });
+    var text = clone.textContent.replace(/\s+/g, ' ').trim();
+    return text ? text.split(' ').length : 0;
+  }
+  function figureSecs(el) {
+    var s = 0;
+    Object.keys(FIGURE_SECS).forEach(function (sel) { s += $$(sel, el).length * FIGURE_SECS[sel]; });
+    return s;
+  }
+  function minutes(words, secs) { return Math.max(1, Math.round((words / WPM * 60 + (secs || 0)) / 60)); }
+
+  var study = null;   // model for the case study on screen: { bar, links, targets, parts[], words, mins }
+  function buildStudy(view) {
+    if (!view || !/^v-cs-/.test(view.id)) { study = null; return; }
+    var parts = $$('.hero, main > .sec', view).map(function (el) { return { el: el, words: wordsIn(el), secs: figureSecs(el) }; });
+    var words = 0, secs = 0;
+    parts.forEach(function (p) { words += p.words; secs += p.secs; });
+    var mins = minutes(words, secs);
+    var chip = $('[data-rt]', view);
+    if (chip) { chip.textContent = mins + ' min read'; chip.title = words.toLocaleString() + ' words'; }
+    var bar = $('.crumbs', view), links = $$('.jump a', bar);
+    study = {
+      bar: bar, live: $('[data-rt-live]', bar), links: links,
+      targets: links.map(function (a) { return $(a.getAttribute('href')); }),
+      parts: parts, words: words, secs: secs, mins: mins, active: -1
+    };
+    if (study.live) { study.live.textContent = mins + ' min read'; study.live.classList.remove('done'); }
+    view.dataset.words = words; view.dataset.minutes = mins;
+  }
+  var stuckIo = null;
+  function watchStuck(view) {
+    if (stuckIo) { stuckIo.disconnect(); stuckIo = null; }
+    var s = view && $('.crumbs-sentinel', view), bar = view && $('.crumbs', view);
+    if (!s || !bar) return;
+    stuckIo = new IntersectionObserver(function (entries) {
+      bar.classList.toggle('stuck', !entries[0].isIntersecting && entries[0].boundingClientRect.top < 100);
+    }, { rootMargin: '-73px 0px 0px 0px', threshold: 0 });
+    stuckIo.observe(s);
+  }
+  /* Called from onScroll: highlight the section under the bar and update "N min left" */
+  function trackStudy(vh) {
+    if (!study) return;
+    var line = study.bar.getBoundingClientRect().bottom + 24;   // just below the pinned bar
+    var active = -1;
+    study.targets.forEach(function (t, i) { if (t && t.getBoundingClientRect().top <= line) active = i; });
+    if (active !== study.active) {
+      study.active = active;
+      study.links.forEach(function (a, i) { a.classList.toggle('act', i === active); });
+      var a = study.links[active];
+      if (a) {   // keep the highlighted pill visible when the row scrolls (phones)
+        var jump = a.parentNode, l = a.offsetLeft, r = l + a.offsetWidth;
+        if (l < jump.scrollLeft) jump.scrollLeft = l - 8;
+        else if (r > jump.scrollLeft + jump.clientWidth) jump.scrollLeft = r - jump.clientWidth + 8;
+      }
+    }
+    if (!study.live) return;
+    var eye = vh * 0.35, read = 0, secsRead = 0;
+    study.parts.forEach(function (p) {
+      var r = p.el.getBoundingClientRect();
+      if (r.bottom <= eye) { read += p.words; secsRead += p.secs; }
+      else if (r.top < eye) { var f = (eye - r.top) / Math.max(1, r.height); read += p.words * f; secsRead += p.secs * f; }
+    });
+    var atEnd = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8;
+    var leftSecs = (study.words - read) / WPM * 60 + (study.secs - secsRead);
+    var text = atEnd || leftSecs < 20 ? 'Done reading' : read < 40 ? study.mins + ' min read' : Math.max(1, Math.round(leftSecs / 60)) + ' min left';
+    if (study.live.textContent !== text) { study.live.textContent = text; study.live.classList.toggle('done', text === 'Done reading'); }
+  }
+
   /* ---------- Routing ---------- */
   var ROUTES = {
     '#/': 'home',
@@ -181,6 +257,7 @@
     scrubs = $$('[data-scrub]', view);
     tl = $('.tl', view);
     tlItems = tl ? $$(':scope > li', tl) : [];
+    buildStudy(view); watchStuck(view);
     if (reduce && tl) {
       tlItems.forEach(function (i) { i.classList.add('on'); });
       tl.style.setProperty('--fill', '100%');
@@ -196,6 +273,7 @@
       var vh = window.innerHeight;
       var doc = document.documentElement;
       bar.style.transform = 'scaleX(' + Math.min(1, window.scrollY / Math.max(1, doc.scrollHeight - vh)) + ')';
+      trackStudy(vh);
       if (reduce) return;
 
       scrubs.forEach(function (el) {
